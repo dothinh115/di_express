@@ -45,8 +45,7 @@ export const createMethodDecorator = (path: string, method: Method) => {
     const paramData = target[propertyKey].paramData ?? [];
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
-      const req = args[0];
-      const res = args[1];
+      const [req, res] = args;
       paramData.map((param: any) => {
         args[param.index] = param.filter(req, res);
       });
