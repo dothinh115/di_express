@@ -1,14 +1,13 @@
-const CONTROLLER_METADATA_KEY = Symbol("controllers");
+const CONTROLLER_PATH_METADATA_KEY = Symbol("controller-path");
 
-export const Controller = (): ClassDecorator => {
+export const Controller = (path: string = ""): ClassDecorator => {
   return (target) => {
-    const controllers =
-      Reflect.getMetadata(CONTROLLER_METADATA_KEY, Object) ?? [];
-    controllers.push(target);
-    Reflect.defineMetadata(CONTROLLER_METADATA_KEY, controllers, Object);
+    if (path) {
+      Reflect.defineMetadata(CONTROLLER_PATH_METADATA_KEY, path, target);
+    }
   };
 };
 
-export const getControllers = (): any[] => {
-  return Reflect.getMetadata(CONTROLLER_METADATA_KEY, Object) ?? [];
+export const getControllerPath = (target: any) => {
+  return Reflect.getMetadata(CONTROLLER_PATH_METADATA_KEY, target);
 };
