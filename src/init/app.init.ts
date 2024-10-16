@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { Container } from "../di/container.di";
 import { registerRoutes } from "../routes/register.route";
 import { handleErrorMiddleware } from "../middlewares/handle-error.middleware";
@@ -28,17 +28,33 @@ export const createApp = ({
     return container.get(controller);
   });
 
-  console.clear();
+  // console.clear();
+
+  if (middlewares && middlewares.length > 0) {
+    app.use(...middlewares);
+  }
+
+  if (guards && guards.length > 0) {
+    app.use(...guards);
+  }
+
   instances.map((instance) => {
     const router = registerRoutes(instance, prefix);
-    app.use([
-      ...(middlewares ?? []),
-      ...(guards ?? []),
-      router,
-      ...(interceptors ?? []),
-      reponseFormatterMiddleware,
-      handleErrorMiddleware,
-    ]);
+    app.use(router);
+  });
+
+  if (interceptors && interceptors.length > 0) {
+    app.use(...interceptors);
+  }
+
+  app.use(reponseFormatterMiddleware);
+  app.use(handleErrorMiddleware);
+
+  app.use((req: Request, res: Response) => {
+    res.status(404).send({
+      statusCode: 404,
+      message: "Not Found",
+    });
   });
 
   return app;
