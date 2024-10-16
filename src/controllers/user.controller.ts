@@ -3,6 +3,7 @@ import { Controller } from "../decorators/controller.decorator";
 import { Get, Post } from "../decorators/method.decorator";
 import { UserService } from "../services/user.service";
 import { Param } from "../decorators/param.decorator";
+import { BadRequestException } from "../middlewares/handle-error.middleware";
 
 @Controller("/user")
 export class UserController {
@@ -10,7 +11,7 @@ export class UserController {
 
   @Get(":id")
   getUser(@Param("id") id: string) {
-    console.log(id);
+    if (id !== "1") throw new BadRequestException("Phải = 1");
     return this.userService.getUser();
   }
 

@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { createParamDecorator } from "../utils/common";
 
 export const Param = (paramName: string): ParameterDecorator => {
   return createParamDecorator((req: Request) => req.params[paramName]);
@@ -11,4 +10,21 @@ export const Req = (): ParameterDecorator => {
 
 export const Res = (): ParameterDecorator => {
   return createParamDecorator((req: Request, res: Response) => res);
+};
+
+const createParamDecorator = (filter: (req: Request, res: Response) => any) => {
+  return (
+    target: any,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number
+  ) => {
+    if (!propertyKey) return;
+    target[propertyKey].paramData = [
+      ...(target[propertyKey].paramData ?? []),
+      {
+        index: parameterIndex,
+        filter,
+      },
+    ];
+  };
 };
