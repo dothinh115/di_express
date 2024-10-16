@@ -8,9 +8,13 @@ import { authGuard } from "./guards/auth.guard";
 
 const app = createApp({
   controllers: [UserController, PostController, SongController],
-  prefix: ["/api", "/v1"],
   interceptors: [reponseFormatterMiddleware],
   guards: [authGuard],
+});
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 // middleware -> guard -> handler -> interceptor -> error handler
