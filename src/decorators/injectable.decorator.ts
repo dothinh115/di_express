@@ -4,7 +4,7 @@ import { INJECT_MODEL_METADATA_KEY } from "../mongoose/decorators/inject-model.d
 export const Injectable = (): ClassDecorator => {
   return (target: any) => {
     const modelData: { index: number; model: Model<any> }[] =
-      Reflect.getMetadata(INJECT_MODEL_METADATA_KEY, target);
+      Reflect.getMetadata(INJECT_MODEL_METADATA_KEY, target) ?? [];
 
     const originalConstructor = target;
     const newConstructor = function (...args: any[]) {

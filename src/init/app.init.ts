@@ -28,7 +28,7 @@ export const createApp = ({
     return container.get(controller);
   });
 
-  // console.clear();
+  console.clear();
 
   if (middlewares && middlewares.length > 0) {
     app.use(...middlewares);

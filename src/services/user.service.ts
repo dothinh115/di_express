@@ -5,6 +5,7 @@ import { User } from "../mongoose/models/user.model";
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User) private userModel: typeof User) {}
+
   async getUser() {
     return await this.userModel.find();
   }
