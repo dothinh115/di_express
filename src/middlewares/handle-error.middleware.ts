@@ -17,7 +17,6 @@ export const handleErrorMiddleware = (
     message = error.message;
     statusCode = error.statusCode;
   }
-
   res.status(statusCode).send({
     statusCode,
     message,
@@ -26,8 +25,12 @@ export const handleErrorMiddleware = (
 
 export class BadRequestException extends Error {
   statusCode: number;
-  constructor(message: string) {
+  message: any;
+  constructor(message: any) {
     super(message);
+    if (Array.isArray(message)) {
+      this.message = message;
+    }
     this.statusCode = 400;
   }
 }

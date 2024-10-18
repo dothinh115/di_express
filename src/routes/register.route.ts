@@ -22,7 +22,11 @@ export const registerRoutes = (instance: any, prefix: string[] = []) => {
 const asyncHandler = (instance: any, route: TRouteData) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await (instance[route.handler] as Function)(req, res);
+      const result = await (instance[route.handler] as Function)(
+        req,
+        res,
+        next
+      );
       res.locals.data = result;
       next();
     } catch (error) {

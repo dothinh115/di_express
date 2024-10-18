@@ -36,11 +36,12 @@ const createMethodDecorator = (path: string, method: Method) => {
 
     const paramData = target[propertyKey].paramData ?? [];
     const originalMethod = descriptor.value;
-    descriptor.value = function (...args: any[]) {
-      const [req, res] = args;
-      paramData.map((param: any) => {
-        args[param.index] = param.filter(req, res);
-      });
+    descriptor.value = async function (...args: any[]) {
+      const [req, res, next] = args;
+      for (const param of paramData) {
+        const newParam = await param.filter(req, res, next);
+        args[param.index] = newParam;
+      }
       return originalMethod.apply(this, args);
     };
     return descriptor;

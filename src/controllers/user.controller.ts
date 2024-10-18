@@ -1,8 +1,9 @@
 import { Controller } from "../decorators/controller.decorator";
-import { Get } from "../decorators/method.decorator";
+import { Get, Post } from "../decorators/method.decorator";
 import { UserService } from "../services/user.service";
-import { Param } from "../decorators/param.decorator";
+import { Body, Param } from "../decorators/param.decorator";
 import { BadRequestException } from "../middlewares/handle-error.middleware";
+import { CreateUserDto } from "../dto/create-user.dto";
 
 @Controller("/user")
 export class UserController {
@@ -17,5 +18,11 @@ export class UserController {
   @Get(":id")
   getSingleUser(@Param("id") id: string) {
     return this.userService.getSingleUser(id);
+  }
+
+  @Post()
+  async create(@Body() body: CreateUserDto) {
+    console.log(body);
+    return body;
   }
 }
