@@ -1,4 +1,4 @@
-const CONTROLLER_PATH_METADATA_KEY = Symbol("controller-path");
+import { CONTROLLER_PATH_METADATA_KEY } from "../utils/contants";
 
 export const Controller = (path: string = ""): ClassDecorator => {
   return (target) => {

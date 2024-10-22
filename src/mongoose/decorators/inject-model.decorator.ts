@@ -1,6 +1,5 @@
 import { Model } from "mongoose";
-
-export const INJECT_MODEL_METADATA_KEY = Symbol("inject:model");
+import { PARAM_METADATA_KEY } from "../../utils/contants";
 
 export const InjectModel = (model: Model<any>) => {
   return (
@@ -8,12 +7,11 @@ export const InjectModel = (model: Model<any>) => {
     propertyKey: string | symbol | undefined,
     parameterIndex: number
   ) => {
-    const modelData =
-      Reflect.getMetadata(INJECT_MODEL_METADATA_KEY, target) ?? [];
+    const modelData = Reflect.getMetadata(PARAM_METADATA_KEY, target) ?? [];
     modelData.push({
       index: parameterIndex,
-      model,
+      replaceWith: model,
     });
-    Reflect.defineMetadata(INJECT_MODEL_METADATA_KEY, modelData, target);
+    Reflect.defineMetadata(PARAM_METADATA_KEY, modelData, target);
   };
 };

@@ -1,15 +1,14 @@
-import { Model } from "mongoose";
-import { INJECT_MODEL_METADATA_KEY } from "../mongoose/decorators/inject-model.decorator";
+import { PARAM_METADATA_KEY } from "../utils/contants";
 
 export const Injectable = (): ClassDecorator => {
   return (target: any) => {
-    const modelData: { index: number; model: Model<any> }[] =
-      Reflect.getMetadata(INJECT_MODEL_METADATA_KEY, target) ?? [];
+    const modelData: { index: number; replaceWith: any }[] =
+      Reflect.getMetadata(PARAM_METADATA_KEY, target) ?? [];
 
     const originalConstructor = target;
     const newConstructor = function (...args: any[]) {
       modelData.map((param) => {
-        args[param.index] = param.model;
+        args[param.index] = param.replaceWith;
       });
       return new originalConstructor(...args);
     };

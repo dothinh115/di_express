@@ -2,6 +2,7 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { NextFunction, Request, Response } from "express";
 import { BadRequestException } from "../middlewares/handle-error.middleware";
+import { PARAM_DATA_METADATA_KEY } from "../utils/contants";
 
 export const Param = (paramName: string): ParameterDecorator => {
   return createParamDecorator((req: Request) => req.params[paramName]);
@@ -66,12 +67,20 @@ const createParamDecorator = (
     parameterIndex: number
   ) => {
     if (!propertyKey) return;
-    target[propertyKey].paramData = [
-      ...(target[propertyKey].paramData ?? []),
+    const currentParamData =
+      Reflect.getMetadata(PARAM_DATA_METADATA_KEY, target, propertyKey) ?? [];
+    const updatedParamData = [
+      ...(currentParamData ?? []),
       {
         index: parameterIndex,
         filter,
       },
     ];
+    Reflect.defineMetadata(
+      PARAM_DATA_METADATA_KEY,
+      updatedParamData,
+      target,
+      propertyKey
+    );
   };
 };

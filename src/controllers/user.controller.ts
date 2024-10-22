@@ -10,8 +10,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  getUser(@Param("id") id: string) {
-    if (id !== "1") throw new BadRequestException("Phải = 1");
+  getUser() {
     return this.userService.getUser();
   }
 
