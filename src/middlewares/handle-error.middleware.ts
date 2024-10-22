@@ -17,6 +17,7 @@ export const handleErrorMiddleware = (
     message = error.message;
     statusCode = error.statusCode;
   }
+  console.log(error);
   res.status(statusCode).send({
     statusCode,
     message,

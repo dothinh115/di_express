@@ -2,18 +2,21 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { NextFunction, Request, Response } from "express";
 import { BadRequestException } from "../middlewares/handle-error.middleware";
-import { PARAM_DATA_METADATA_KEY } from "../utils/contants";
+import {
+  CONSTRUCTOR_PARAM_METADATA_KEY,
+  METHOD_PARAM_DATA_METADATA_KEY,
+} from "../utils/constants";
 
 export const Param = (paramName: string): ParameterDecorator => {
-  return createParamDecorator((req: Request) => req.params[paramName]);
+  return createMethodParamDecorator((req: Request) => req.params[paramName]);
 };
 
 export const Req = (): ParameterDecorator => {
-  return createParamDecorator((req: Request) => req);
+  return createMethodParamDecorator((req: Request) => req);
 };
 
 export const Res = (): ParameterDecorator => {
-  return createParamDecorator((req: Request, res: Response) => res);
+  return createMethodParamDecorator((req: Request, res: Response) => res);
 };
 
 export const Body = (): ParameterDecorator => {
@@ -29,7 +32,7 @@ export const Body = (): ParameterDecorator => {
       propertyKey
     );
     const paramType = paramTypes[parameterIndex];
-    return createParamDecorator(async (req: Request) => {
+    return createMethodParamDecorator(async (req: Request) => {
       let body = req.body;
       if (
         typeof paramType === "function" &&
@@ -58,7 +61,7 @@ export const Body = (): ParameterDecorator => {
   };
 };
 
-const createParamDecorator = (
+const createMethodParamDecorator = (
   filter: (req: Request, res: Response, next: NextFunction) => any
 ) => {
   return (
@@ -67,20 +70,37 @@ const createParamDecorator = (
     parameterIndex: number
   ) => {
     if (!propertyKey) return;
-    const currentParamData =
-      Reflect.getMetadata(PARAM_DATA_METADATA_KEY, target, propertyKey) ?? [];
-    const updatedParamData = [
-      ...(currentParamData ?? []),
-      {
-        index: parameterIndex,
-        filter,
-      },
-    ];
+    const paramData =
+      Reflect.getMetadata(
+        METHOD_PARAM_DATA_METADATA_KEY,
+        target,
+        propertyKey
+      ) ?? [];
+    paramData.push({
+      index: parameterIndex,
+      filter,
+    });
     Reflect.defineMetadata(
-      PARAM_DATA_METADATA_KEY,
-      updatedParamData,
+      METHOD_PARAM_DATA_METADATA_KEY,
+      paramData,
       target,
       propertyKey
     );
+  };
+};
+
+export const createConstructorParamDecorator = (replaceWith: any) => {
+  return (
+    target: any,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number
+  ) => {
+    const modelData =
+      Reflect.getMetadata(CONSTRUCTOR_PARAM_METADATA_KEY, target) ?? [];
+    modelData.push({
+      index: parameterIndex,
+      replaceWith,
+    });
+    Reflect.defineMetadata(CONSTRUCTOR_PARAM_METADATA_KEY, modelData, target);
   };
 };

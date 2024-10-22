@@ -1,9 +1,9 @@
 import { TRouteData } from "../types/common.type";
 import { Method } from "../types/method.type";
 import {
-  PARAM_DATA_METADATA_KEY,
+  METHOD_PARAM_DATA_METADATA_KEY,
   ROUTES_METADATA_KEY,
-} from "../utils/contants";
+} from "../utils/constants";
 
 export const Get = (path: string = "") => {
   return createMethodDecorator(path, Method.GET);
@@ -36,9 +36,12 @@ const createMethodDecorator = (path: string, method: Method) => {
     });
     Reflect.defineMetadata(ROUTES_METADATA_KEY, routes, target.constructor);
 
-    // const paramData = target[propertyKey].paramData ?? [];
     const paramData =
-      Reflect.getMetadata(PARAM_DATA_METADATA_KEY, target, propertyKey) ?? [];
+      Reflect.getMetadata(
+        METHOD_PARAM_DATA_METADATA_KEY,
+        target,
+        propertyKey
+      ) ?? [];
 
     const originalMethod = descriptor.value;
     descriptor.value = async function (...args: any[]) {

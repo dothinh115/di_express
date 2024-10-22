@@ -29,6 +29,7 @@ class Container {
         this.register(param);
         return this.get(param);
       }
+      return param;
     });
 
     const instance = new service(...dependencies);

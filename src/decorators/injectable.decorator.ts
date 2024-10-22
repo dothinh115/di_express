@@ -1,10 +1,9 @@
-import { PARAM_METADATA_KEY } from "../utils/contants";
+import { CONSTRUCTOR_PARAM_METADATA_KEY } from "../utils/constants";
 
 export const Injectable = (): ClassDecorator => {
   return (target: any) => {
     const modelData: { index: number; replaceWith: any }[] =
-      Reflect.getMetadata(PARAM_METADATA_KEY, target) ?? [];
-
+      Reflect.getMetadata(CONSTRUCTOR_PARAM_METADATA_KEY, target) ?? [];
     const originalConstructor = target;
     const newConstructor = function (...args: any[]) {
       modelData.map((param) => {
@@ -12,15 +11,19 @@ export const Injectable = (): ClassDecorator => {
       });
       return new originalConstructor(...args);
     };
+
     newConstructor.prototype = originalConstructor.prototype;
     Object.defineProperty(newConstructor, "name", {
       value: originalConstructor.name,
     });
-    const paramTypes = Reflect.getMetadata(
-      "design:paramtypes",
-      originalConstructor
-    );
-    Reflect.defineMetadata("design:paramtypes", paramTypes, newConstructor);
+    const metadataKey = Reflect.getMetadataKeys(originalConstructor);
+    metadataKey.forEach((key) => {
+      const originalMetadataValue = Reflect.getMetadata(
+        key,
+        originalConstructor
+      );
+      Reflect.defineMetadata(key, originalMetadataValue, newConstructor);
+    });
     return newConstructor as typeof originalConstructor;
   };
 };
