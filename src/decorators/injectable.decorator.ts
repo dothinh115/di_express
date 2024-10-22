@@ -13,6 +13,15 @@ export const Injectable = (): ClassDecorator => {
       });
       return new originalConstructor(...args);
     };
+    newConstructor.prototype = originalConstructor.prototype;
+    Object.defineProperty(newConstructor, "name", {
+      value: originalConstructor.name,
+    });
+    const paramTypes = Reflect.getMetadata(
+      "design:paramtypes",
+      originalConstructor
+    );
+    Reflect.defineMetadata("design:paramtypes", paramTypes, newConstructor);
     return newConstructor as typeof originalConstructor;
   };
 };

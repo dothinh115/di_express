@@ -6,6 +6,7 @@ import express from "express";
 import { AppManager } from "./init/app.init";
 import { connectDb } from "./mongoose/connect";
 
+console.clear();
 const appManager = new AppManager({
   controllers: [UserController, PostController, SongController],
   middlewares: [express.json(), express.urlencoded({ extended: true })],
