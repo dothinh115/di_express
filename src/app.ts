@@ -7,10 +7,17 @@ import { AppManager } from "./init/app.init";
 import { connectDb } from "./mongoose/connect";
 import { AuthController } from "./controllers/auth.controller";
 import passport from "passport";
+import { MeController } from "./controllers/me.controller";
 
 console.clear();
 const appManager = new AppManager({
-  controllers: [UserController, PostController, SongController, AuthController],
+  controllers: [
+    UserController,
+    PostController,
+    SongController,
+    AuthController,
+    MeController,
+  ],
   middlewares: [
     express.json(),
     express.urlencoded({ extended: true }),

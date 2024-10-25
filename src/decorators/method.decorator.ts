@@ -6,24 +6,54 @@ import {
   ROUTE_METADATA_KEY,
 } from "../utils/constants";
 
-export const Get = (path: string = "") => {
+export const Get = (path: string = ""): MethodDecorator => {
   return createMethodDecorator({ path, method: Method.GET });
 };
 
-export const Post = (path: string = "") => {
+export const Post = (path: string = ""): MethodDecorator => {
   return createMethodDecorator({ path, method: Method.POST });
 };
 
-export const Patch = (path: string = "") => {
+export const Patch = (path: string = ""): MethodDecorator => {
   return createMethodDecorator({ path, method: Method.PATCH });
 };
 
-export const Delete = (path: string = "") => {
+export const Delete = (path: string = ""): MethodDecorator => {
   return createMethodDecorator({ path, method: Method.DELETE });
 };
 
-export const Protected = () => {
-  return createMethodDecorator({ isProtected: true });
+export const Protected = (): MethodDecorator & ClassDecorator => {
+  return (
+    target: any,
+    propertyKey?: string | symbol | undefined,
+    descriptor?: PropertyDescriptor
+  ) => {
+    if (descriptor) {
+      return createMethodDecorator({ isProtected: true })(
+        target,
+        propertyKey,
+        descriptor
+      ) as any;
+    } else {
+      const methodNames = Object.getOwnPropertyNames(target.prototype).filter(
+        (method) => method !== "constructor"
+      );
+      if (methodNames.length > 0) {
+        methodNames.forEach((methodName) => {
+          const methodDescriptor = Object.getOwnPropertyDescriptor(
+            target.prototype,
+            methodName
+          );
+          if (!methodDescriptor) return;
+          createMethodDecorator({ isProtected: true })(
+            target.prototype,
+            methodName,
+            methodDescriptor
+          );
+        });
+      }
+    }
+  };
 };
 
 const createMethodDecorator = ({
@@ -37,9 +67,10 @@ const createMethodDecorator = ({
 }) => {
   return (
     target: any,
-    propertyKey: string | symbol,
+    propertyKey: string | symbol | undefined,
     descriptor: PropertyDescriptor
   ) => {
+    if (!propertyKey) return;
     const currentMethodMetadata =
       Reflect.getMetadata(ROUTE_METADATA_KEY, target, propertyKey) ?? {};
     const updatedMethodMetadata = {

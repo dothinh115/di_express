@@ -14,6 +14,7 @@ export const unAuthorizedHandlerMiddleware = (
       if (info) {
         next(new UnAuthorizedException());
       } else {
+        req.user = user;
         next();
       }
     }

@@ -19,6 +19,10 @@ export const Res = (): ParameterDecorator => {
   return createMethodParamDecorator((req: Request, res: Response) => res);
 };
 
+export const User = (): ParameterDecorator => {
+  return createMethodParamDecorator((req: Request) => req.user);
+};
+
 export const Body = (): ParameterDecorator => {
   return (
     target: any,
