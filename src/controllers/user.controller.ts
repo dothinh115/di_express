@@ -1,5 +1,5 @@
 import { Controller } from "../decorators/controller.decorator";
-import { Get, Post } from "../decorators/method.decorator";
+import { Get, Post, Protected } from "../decorators/method.decorator";
 import { UserService } from "../services/user.service";
 import { Body, Param } from "../decorators/param.decorator";
 import { BadRequestException } from "../middlewares/handle-error.middleware";
@@ -19,9 +19,9 @@ export class UserController {
     return this.userService.getSingleUser(id);
   }
 
+  @Protected()
   @Post()
   async create(@Body() body: CreateUserDto) {
-    console.log(body);
     return body;
   }
 }

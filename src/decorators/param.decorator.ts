@@ -32,8 +32,10 @@ export const Body = (): ParameterDecorator => {
       propertyKey
     );
     const paramType = paramTypes[parameterIndex];
+
     return createMethodParamDecorator(async (req: Request) => {
       let body = req.body;
+
       if (
         typeof paramType === "function" &&
         paramType !== Object &&

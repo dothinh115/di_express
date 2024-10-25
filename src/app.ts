@@ -5,11 +5,17 @@ import { SongController } from "./controllers/song.controller";
 import express from "express";
 import { AppManager } from "./init/app.init";
 import { connectDb } from "./mongoose/connect";
+import { AuthController } from "./controllers/auth.controller";
+import passport from "passport";
 
 console.clear();
 const appManager = new AppManager({
-  controllers: [UserController, PostController, SongController],
-  middlewares: [express.json(), express.urlencoded({ extended: true })],
+  controllers: [UserController, PostController, SongController, AuthController],
+  middlewares: [
+    express.json(),
+    express.urlencoded({ extended: true }),
+    passport.initialize(),
+  ],
 });
 
 const uri = "mongodb://root:1234@localhost:27017";

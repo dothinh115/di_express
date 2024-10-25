@@ -3,6 +3,7 @@ import { Container } from "../di/container.di";
 import { registerRoutes } from "../routes/register.route";
 import { handleErrorMiddleware } from "../middlewares/handle-error.middleware";
 import { reponseFormatterMiddleware } from "../middlewares/response-formatter.middleware";
+import * as dotenv from "dotenv";
 
 type TCreateApp = {
   controllers: any[];
@@ -33,6 +34,7 @@ export class AppManager {
     this.interceptors = interceptors;
     this.middlewares = middlewares;
     this.guards = guards;
+    dotenv.config();
     this.app = express();
     this.container = new Container();
     this.instances = this.createInstances();
