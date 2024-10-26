@@ -1,28 +1,26 @@
 import { NextFunction, Request, Response } from "express";
+import { AppErrorMiddleware } from "../core/middlewares/base.middleware";
 
-export const handleErrorMiddleware = (
-  error: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  let message = "Internal Error";
-  let statusCode = 500;
+export class HandleErrorMiddleware implements AppErrorMiddleware {
+  use(error: any, req: Request, res: Response, next: NextFunction) {
+    let message = "Internal Error";
+    let statusCode = 500;
 
-  if (
-    error instanceof BadRequestException ||
-    error instanceof UnAuthorizedException ||
-    error instanceof ForbiddenException
-  ) {
-    message = error.message;
-    statusCode = error.statusCode;
+    if (
+      error instanceof BadRequestException ||
+      error instanceof UnAuthorizedException ||
+      error instanceof ForbiddenException
+    ) {
+      message = error.message;
+      statusCode = error.statusCode;
+    }
+    console.log(error);
+    res.status(statusCode).send({
+      statusCode,
+      message,
+    });
   }
-  console.log(error);
-  res.status(statusCode).send({
-    statusCode,
-    message,
-  });
-};
+}
 
 export class BadRequestException extends Error {
   statusCode: number;

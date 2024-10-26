@@ -1,9 +1,11 @@
 import express, { Application, Request, Response } from "express";
-import { Container } from "../di/container.di";
 import { registerRoutes } from "../routes/register.route";
-import { handleErrorMiddleware } from "../middlewares/handle-error.middleware";
-import { reponseFormatterMiddleware } from "../middlewares/response-formatter.middleware";
 import * as dotenv from "dotenv";
+import { Container } from "../di/container.di";
+import { ResponseFormatterMiddleware } from "../../middlewares/response-formatter.middleware";
+import { HandleErrorMiddleware } from "../../middlewares/handle-error.middleware";
+import { Handle404Middleware } from "../../middlewares/handle-404.middleware";
+import { ExcuteHandlerMiddleware } from "../middlewares/handler.middleware";
 
 type TCreateApp = {
   controllers: any[];
@@ -32,7 +34,11 @@ export class AppManager {
     this.controllers = controllers;
     this.prefix = prefix;
     this.interceptors = interceptors;
-    this.middlewares = middlewares;
+    this.middlewares = [
+      express.json(),
+      express.urlencoded({ extended: true }),
+      ...(middlewares ?? []),
+    ];
     this.guards = guards;
     dotenv.config();
     this.app = express();
@@ -41,14 +47,30 @@ export class AppManager {
   }
 
   initialize() {
-    this.middlewareRegster();
-    this.guardRegister();
     this.routeRegister();
-    this.interceptorRegister();
-    this.app.use(reponseFormatterMiddleware);
-    this.app.use(handleErrorMiddleware);
-    this.route404Register();
+    this.applyMiddleware([
+      ...(this.middlewares ?? []),
+      ...(this.guards ?? []),
+      ExcuteHandlerMiddleware,
+      ResponseFormatterMiddleware,
+      HandleErrorMiddleware,
+      Handle404Middleware,
+    ]);
+
     return this.app;
+  }
+
+  applyMiddleware(middlewares: any[] | undefined) {
+    if (middlewares && middlewares.length > 0) {
+      middlewares.forEach((middleware) => {
+        try {
+          const instance = new middleware();
+          this.app.use(instance.use.bind(instance));
+        } catch (error) {
+          this.app.use(middleware);
+        }
+      });
+    }
   }
 
   createInstances() {
@@ -58,37 +80,10 @@ export class AppManager {
     });
   }
 
-  middlewareRegster() {
-    if (this.middlewares && this.middlewares.length > 0) {
-      this.app.use(...this.middlewares);
-    }
-  }
-
-  guardRegister() {
-    if (this.guards && this.guards.length > 0) {
-      this.app.use(...this.guards);
-    }
-  }
-
   routeRegister() {
     this.instances.map((instance) => {
       const router = registerRoutes(instance, this.prefix);
       this.app.use(router);
-    });
-  }
-
-  interceptorRegister() {
-    if (this.interceptors && this.interceptors.length > 0) {
-      this.app.use(...this.interceptors);
-    }
-  }
-
-  route404Register() {
-    this.app.use((req: Request, res: Response) => {
-      res.status(404).send({
-        statusCode: 404,
-        message: "Not Found",
-      });
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Constructor } from "../types/constructor.type";
+import { Constructor } from "../../types/constructor.type";
 
 class Container {
   services = new Map<string, Constructor<any>>();

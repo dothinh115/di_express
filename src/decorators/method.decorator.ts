@@ -1,6 +1,8 @@
 import { TRouteData } from "../types/common.type";
 import { Method } from "../types/method.type";
 import {
+  IS_PROTECTED_METADATA_KEY,
+  IS_PUBLIC_METADAT_KEY,
   IS_REPLACED_METADATA_KEY,
   METHOD_PARAM_DATA_METADATA_KEY,
   ROUTE_METADATA_KEY,
@@ -29,26 +31,51 @@ export const Protected = (): MethodDecorator & ClassDecorator => {
     descriptor?: PropertyDescriptor
   ) => {
     if (descriptor) {
-      return createMethodDecorator({ isProtected: true })(
+      if (!propertyKey) return;
+      Reflect.defineMetadata(
+        IS_PROTECTED_METADATA_KEY,
+        true,
         target,
-        propertyKey,
-        descriptor
-      ) as any;
+        propertyKey
+      );
     } else {
       const methodNames = Object.getOwnPropertyNames(target.prototype).filter(
         (method) => method !== "constructor"
       );
       if (methodNames.length > 0) {
         methodNames.forEach((methodName) => {
-          const methodDescriptor = Object.getOwnPropertyDescriptor(
+          Reflect.defineMetadata(
+            IS_PROTECTED_METADATA_KEY,
+            true,
             target.prototype,
             methodName
           );
-          if (!methodDescriptor) return;
-          createMethodDecorator({ isProtected: true })(
+        });
+      }
+    }
+  };
+};
+
+export const IsPublic = (): MethodDecorator & ClassDecorator => {
+  return (
+    target: any,
+    propertyKey?: string | symbol | undefined,
+    descriptor?: PropertyDescriptor
+  ) => {
+    if (descriptor) {
+      if (!propertyKey) return;
+      Reflect.defineMetadata(IS_PUBLIC_METADAT_KEY, true, target, propertyKey);
+    } else {
+      const methodNames = Object.getOwnPropertyNames(target.prototype).filter(
+        (method) => method !== "constructor"
+      );
+      if (methodNames.length > 0) {
+        methodNames.forEach((methodName) => {
+          Reflect.defineMetadata(
+            IS_PUBLIC_METADAT_KEY,
+            true,
             target.prototype,
-            methodName,
-            methodDescriptor
+            methodName
           );
         });
       }
@@ -59,11 +86,9 @@ export const Protected = (): MethodDecorator & ClassDecorator => {
 const createMethodDecorator = ({
   path,
   method,
-  isProtected,
 }: {
   path?: string;
   method?: Method;
-  isProtected?: boolean;
 }) => {
   return (
     target: any,
@@ -75,11 +100,8 @@ const createMethodDecorator = ({
       Reflect.getMetadata(ROUTE_METADATA_KEY, target, propertyKey) ?? {};
     const updatedMethodMetadata = {
       ...currentMethodMetadata,
-      method: method ? method : currentMethodMetadata.method,
-      path: path ? path : currentMethodMetadata.path ?? "",
-      isProtected: isProtected
-        ? isProtected
-        : currentMethodMetadata.isProtected ?? false,
+      method,
+      path,
     };
     Reflect.defineMetadata(
       ROUTE_METADATA_KEY,
