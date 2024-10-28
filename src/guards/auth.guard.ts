@@ -28,7 +28,7 @@ export class AuthGuard implements AppMiddleware {
       "jwt",
       { session: false },
       (err: any, user: any, info: any) => {
-        if (info) {
+        if (err || info) {
           next(new UnAuthorizedException());
         } else {
           req.user = user;

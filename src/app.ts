@@ -9,7 +9,7 @@ import passport from "passport";
 import { MeController } from "./controllers/me.controller";
 import { AuthGuard } from "./guards/auth.guard";
 
-// console.clear();
+console.clear();
 const appManager = new AppManager({
   controllers: [
     UserController,
