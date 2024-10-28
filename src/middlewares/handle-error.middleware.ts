@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { AppErrorMiddleware } from "../core/middlewares/base.middleware";
+import { Injectable } from "../decorators/injectable.decorator";
 
+@Injectable()
 export class HandleErrorMiddleware implements AppErrorMiddleware {
   use(error: any, req: Request, res: Response, next: NextFunction) {
     let message = "Internal Error";

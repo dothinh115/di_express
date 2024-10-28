@@ -34,6 +34,10 @@ class Container {
 
     const instance = new service(...dependencies);
 
+    if (typeof instance.onInit === "function") {
+      instance.onInit();
+    }
+
     this.registered.set(service.name, instance);
 
     return instance;

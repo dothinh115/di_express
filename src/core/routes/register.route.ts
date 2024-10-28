@@ -8,7 +8,7 @@ export const registerRoutes = (instance: any, prefix: string[] = []) => {
   const router = Router();
   const instanceMethods = Object.getOwnPropertyNames(
     Object.getPrototypeOf(instance)
-  ).filter((method) => method !== "constructor");
+  ).filter((method) => method !== "constructor" && method !== "onInit");
   if (instanceMethods.length > 0) {
     const controllerPath = getControllerPath(instance.constructor);
     instanceMethods.map((methodName) => {

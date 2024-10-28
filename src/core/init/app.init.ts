@@ -64,7 +64,9 @@ export class AppManager {
     if (middlewares && middlewares.length > 0) {
       middlewares.forEach((middleware) => {
         try {
-          const instance = new middleware();
+          new middleware();
+          this.container.register(middleware);
+          const instance = this.container.get<any>(middleware);
           this.app.use(instance.use.bind(instance));
         } catch (error) {
           this.app.use(middleware);

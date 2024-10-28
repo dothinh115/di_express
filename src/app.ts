@@ -2,7 +2,6 @@ import "reflect-metadata";
 import { UserController } from "./controllers/user.controller";
 import { PostController } from "./controllers/post.controller";
 import { SongController } from "./controllers/song.controller";
-import express from "express";
 import { AppManager } from "./core/init/app.init";
 import { connectDb } from "./mongoose/connect";
 import { AuthController } from "./controllers/auth.controller";

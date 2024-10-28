@@ -4,7 +4,7 @@ import { UserService } from "../services/user.service";
 import { Body, Param } from "../decorators/param.decorator";
 import { CreateUserDto } from "../dto/create-user.dto";
 
-@IsPublic()
+// @IsPublic()
 @Controller("/user")
 export class UserController {
   constructor(private userService: UserService) {}
